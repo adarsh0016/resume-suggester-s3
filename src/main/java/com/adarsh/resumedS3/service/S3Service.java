@@ -10,6 +10,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.nio.file.Path;
+import java.util.Base64;
 
 @Service
 public class S3Service {
@@ -32,7 +33,7 @@ public class S3Service {
         s3Client.putObject(request, filePath);
     }
 
-    public byte[] downloadFile(String key) {
+    private byte[] download(String key) {
         GetObjectRequest getRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
@@ -40,5 +41,10 @@ public class S3Service {
 
         ResponseBytes<GetObjectResponse> objectBytes = s3Client.getObjectAsBytes(getRequest);
         return objectBytes.asByteArray();
+    }
+
+    public String downloadFile(String key) {
+        byte[] resumeContent = download(key);
+        return Base64.getEncoder().encodeToString(resumeContent);
     }
 }
