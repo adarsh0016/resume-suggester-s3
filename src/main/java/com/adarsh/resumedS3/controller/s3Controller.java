@@ -1,16 +1,14 @@
 package com.adarsh.resumedS3.controller;
 
 import com.adarsh.resumedS3.DTO.Response;
+import com.adarsh.resumedS3.DTO.ResumeResponse;
 import com.adarsh.resumedS3.DTO.uploadRequest;
 import com.adarsh.resumedS3.service.S3Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,5 +35,12 @@ public class s3Controller {
         Files.write(tempFile, resume);
 
         s3Service.uploadFile(resumeName, tempFile);
+    }
+
+    @GetMapping(path = "/download")
+    public ResumeResponse download(@RequestParam String file_name) {
+        log.info("Download request received for {}", file_name);
+
+        return new ResumeResponse(s3Service.downloadFile(file_name), "success");
     }
 }
